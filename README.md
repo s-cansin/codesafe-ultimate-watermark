@@ -35,13 +35,9 @@ Developed to meet real‑customer needs, this extension works seamlessly with ru
 Here are some screenshots from the extension page:  
 
 ![Image](https://image.opencart.com/cache/5619fcbe27e1f-resize-710x380.jpg)
-
 ![Image](https://i.pinimg.com/736x/a1/f3/49/a1f3491d316ae39a9259aea19ec9c1c7.jpg)
-
 [![Image](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)
-
 [![Image](https://image.opencart.com/cache/561d3c31d87cc-resize-500x500.jpg)](https://image.opencart.com/cache/561d3c31d87cc-resize-500x500.jpg)
-
 [![Image](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)
 
 ---
