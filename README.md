@@ -39,7 +39,7 @@ Here are some screenshots from the extension page:
 [![Image](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)
 [![Image](https://image.opencart.com/cache/561d3c31d87cc-resize-500x500.jpg)](https://image.opencart.com/cache/561d3c31d87cc-resize-500x500.jpg)
 [![Image](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)
-
+[![Image](https://image.opencart.com/cache/561dfdce00186-resize-500x500.jpg)](https://image.opencart.com/cache/561dfdce00186-resize-500x500.jpg)
 ---
 
 ## 📦 Installation Guide  
