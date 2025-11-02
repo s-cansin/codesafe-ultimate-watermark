@@ -38,12 +38,11 @@ Here are some screenshots from the extension page:
 
 ![Image](https://i.pinimg.com/736x/a1/f3/49/a1f3491d316ae39a9259aea19ec9c1c7.jpg)
 
-[![Image](https://www.opencartextensions.in/image/catalog/watermark/add-image-as-watermark-opencart-product-image.png)](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)
+[![Image](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)
 
-[![Image](https://cdnblog.webkul.com/blog/wp-content/uploads/2021/08/products-list-watermark-1.png)](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)
+[![Image]((https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)](https://image.opencart.com/cache/561e40023586f-resize-500x500.jpg)
 
-[![Image](https://image.opencart.com/original/68ed1413dbcc2.jpg)](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)
-
+[![Image](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)](https://image.opencart.com/cache/561dfdcfe6cad-resize-500x500.jpg)
 
 ---
 
