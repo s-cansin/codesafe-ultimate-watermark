@@ -102,4 +102,4 @@ Each purchase grants a **single‑website license**. Redistribution or resale of
 
 ---
 
-© Codesafe — *Ultimate Watermark Solution for OpenCart.*
+© s-cansin — *Ultimate Watermark Solution for OpenCart.*
