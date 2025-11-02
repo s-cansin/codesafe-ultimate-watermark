@@ -1,0 +1,727 @@
+<modification>
+	
+<id>Codesafe Ultimate Watermark V4.2.8</id>
+	
+<version>4.2.8</version>
+	
+<vqmver></vqmver>
+	
+<author>Team CodeSafe</author>
+
+<file name="/system/library/image.php">
+		
+<operation>
+			
+<search position="after"><![CDATA[ = $height;]]></search>
+
+
+<add>
+
+<![CDATA[
+
+$watermark_conf="watermark.conf";
+
+$contentfilter = array();
+$pagefilter = array();
+
+$realrootpath = dirname(__FILE__);
+$realrootpath = str_replace('\vqmod\vqcache','',$realrootpath);
+$realrootpath = str_replace('/vqmod/vqcache','',$realrootpath);
+
+
+$curpath = realpath('.');
+
+if (isset($this->width))    // NEW VERSIONS
+{
+$infowidth=$this->width;
+$infoheight=$this->height;
+}
+else
+{
+$infowidth=$this->info['width'];
+$infoheight=$this->info['height'];
+}
+
+$curfolder = preg_replace('/\\\\/','',str_replace($realrootpath,'', $curpath));
+
+$watermark_conf = $realrootpath  ."/" . $watermark_conf;
+
+include($watermark_conf);
+
+
+if ($curfolder==$admin_dir) {
+
+$admin = true;
+}
+else
+{
+$admin=false;
+}
+
+
+if (!$admin)
+{
+
+
+$watermark_logo = $realrootpath . "/" . $watermark_logo;
+
+$txt_font = $realrootpath . "/" . $txt_font;
+
+
+
+	
+ 		global  $registry;
+   		$model_manufacturer = $registry->get('model_catalog_manufacturer');
+ 		$model_product = $registry->get('model_catalog_product');
+
+
+
+
+if (!function_exists('get_string_between')) {
+function get_string_between($string, $start, $end){
+    $string = " ".$string;
+    $ini = strpos($string,$start);
+    if ($ini == 0) return "";
+    $ini += strlen($start);
+    $len = strpos($string,$end,$ini) - $ini;
+    return substr($string,$ini,$len);
+}
+}
+
+
+
+
+if (isset($_GET["product_id"])==false || is_numeric($_GET["product_id"])==false)
+{
+
+ob_start();
+var_dump($model_product);
+$product_id = ob_get_clean();
+
+$product_id=get_string_between($product_id,'product_id','route');
+//$product_id=get_string_between($product_id,'product_id','}');
+
+$product_id=substr($product_id,1);
+$product_id=get_string_between($product_id,'"','"');
+
+}
+else
+{
+$product_id=$_GET["product_id"];
+}
+
+
+
+
+
+
+	if ($watermark_mode==3)
+{
+
+if ($product_id!=null && $product_id!='')
+{
+
+$result_product = $model_product->getProduct($product_id);
+
+if ($result_product==null){if (isset($product_id) && $product_id>0){$result_product = $model_product->getProduct($product_id);}}
+//if ($result_product==null){if (isset($_GET["product_id"])){$result_product = $model_product->getProduct($_GET["product_id"]);}}
+
+if ($result_product!=null && $result_product!='')
+{
+$watermark_logo_cache=$watermark_logo;
+		
+$manufacturer_id = $result_product['manufacturer_id'];
+ 		
+ 
+if ($manufacturer_id>0)
+{
+
+		$result_manufacturer = $model_manufacturer->getManufacturer($manufacturer_id);
+		if(isset($result_manufacturer['image']))
+		{
+			$watermark_logo = "image/" . $result_manufacturer['image'];
+		}
+}
+
+}
+}
+
+	
+			$watermark_mode=1;
+} 
+
+
+
+if (isset($_SERVER["REQUEST_URI"]))
+{
+$urldata=$_SERVER["REQUEST_URI"];
+$urldata=trim($urldata,"/");
+}
+else
+{
+$urldata="";
+}
+
+
+
+
+
+
+
+$allRules = True;
+if (isset($_GET['route']))
+{
+$route=$_GET['route'];
+}
+elseif ($product_id>0)
+{
+$route="product/product";
+}
+elseif ($urldata=="")
+{
+$route="common/home";
+}
+else
+$route=$urldata;
+
+
+
+
+	
+
+foreach($pagefilter as $val) 
+{
+
+if ($route==$val)
+{
+$allRules = False;
+break;
+}
+
+}
+
+foreach($contentfilter as $val) {
+if (strpos($this->file,$val)!=0)
+{
+$allRules = False;
+break;
+}
+}
+
+if (isset($sizefilter) && $sizefilter && ($infoheight<=200 || $infowidth<=200)) $allRules=FALSE;
+
+
+$watermarkRules=FALSE;
+
+if ($watermark_logo!="")
+{
+if ($watermark_mode==1)
+{
+
+if (substr($watermark_logo, 0, 7) != 'http://' && substr($watermark_logo, 0, 8) != 'https://' && substr($watermark_logo, 0, 6) != 'ftp://')
+{
+
+if (is_file($watermark_logo))
+{
+if (function_exists('exif_imagetype')) {
+$watermark_mime = image_type_to_mime_type(exif_imagetype($watermark_logo));
+} 
+else 
+{
+if (strpos($watermark_logo,'.') !== false)
+{
+if (sizeof(explode(".", $watermark_logo))>0)
+{
+
+$str_frags = ((Array)explode(".", $watermark_logo));
+$watermark_mime = strtolower($str_frags[((int)sizeof($str_frags))-1]);
+
+}
+}
+else
+{
+$watermark_mime = 'image/png';
+}
+}
+
+$watermarkRules=TRUE;
+}
+else echo "Warning: missing watermark (local) file  $watermark_logo<br>";
+}
+else
+{
+
+
+$file_headers = @get_headers($watermark_logo);
+if (is_array($file_headers))
+{
+if($file_headers[0] != 'HTTP/1.0 404 Not Found' && $file_headers[0] != 'HTTP/1.0 302 Found' && $file_headers[7] != 'HTTP/1.0 404 Not Found')
+{
+
+
+foreach ($file_headers as $key=>$value) 
+{
+if (strpos($value,"Content-Type: image/") !== false) {
+
+$value = $file_headers[$key];
+
+if (is_string($value)) 
+{
+$watermark_mime = explode(": ", $value);
+if (array_key_exists(1,$watermark_mime))
+{
+$watermark_mime = (string)$watermark_mime[1];
+}
+else
+{
+if (strpos($watermark_logo,'.') !== false)
+{
+if (sizeof(explode(".", $watermark_logo))>0)
+{
+
+$str_frags = ((Array)explode(".", $watermark_logo));
+$watermark_mime = strtolower($str_frags[((int)sizeof($str_frags))-1]);
+
+}
+}
+else
+{
+$watermark_mime = 'image/png';
+}
+}
+$watermarkRules=TRUE;
+break;
+
+
+
+}
+
+}
+}
+
+}
+}
+
+
+
+
+
+if ($watermarkRules!=TRUE) echo "Warning: missing watermark (remote) file  $watermark_logo<br>";
+
+}
+}
+
+
+
+if($watermark_mode==2 && $txt_cont!="")
+{
+if (function_exists("imageftbbox"))
+{
+
+if (file_exists($txt_font))
+{
+$watermarkRules=TRUE;
+$watermark_mime = "image/png";
+}
+else
+{
+echo "Warning: missing .ttf font file  $txt_font<br>";
+}
+
+}
+else
+{
+echo "Warning: FreeType library is not enabled on your hosting configuration, you need imageftbbox() method supported by FreeType library, for text(.ttf) watermarking operations<br>";
+}
+}
+
+}
+
+
+
+
+
+if ($allRules)
+{
+if ($watermarkRules)
+{
+
+if ($new_width>$new_height){$Nref=$new_width;}else{$Nref=$new_height;}
+
+
+$pageURL = 'http';
+if (isset($_SERVER["HTTPS"])) 
+{
+$pageURL .= "s";
+}
+ $pageURL .= "://";
+ if ($_SERVER["SERVER_PORT"] != "80") {
+  $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"]."/";
+ } else {
+  $pageURL .= $_SERVER["SERVER_NAME"]."/";
+}
+
+$watermark = null;
+
+$watermark_size_ratio = ($Nref/1000) * ($watermark_size/10);
+
+if ($watermark_repeat==TRUE) $watermark_position = "topleft";
+
+
+
+
+
+if ($watermark_mode==2)
+{
+$watermark_size = $watermark_size * $watermark_size_ratio;
+
+list($txt_left,$txt_bottom, $txt_right,,,,,$txt_top) = imageftbbox($watermark_size, 0, $txt_font, $txt_cont);
+$watermark_height = ($txt_bottom-$txt_top)+10;
+$watermark_width = ($txt_right - $txt_left)+10;
+
+$watermark = imagecreatetruecolor($watermark_width, $watermark_height);
+imagealphablending($watermark, false);
+imagesavealpha($watermark, true);
+
+$col=imagecolorallocatealpha($watermark,255,255,255,127);
+imagefill($watermark, 0, 0, $col);
+
+   $hex = str_replace("#", "", $txt_color);
+
+   if(strlen($hex) == 3) {
+      $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+      $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+      $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+   } else {
+      $r = hexdec(substr($hex,0,2));
+      $g = hexdec(substr($hex,2,2));
+      $b = hexdec(substr($hex,4,2));
+   }
+
+$color = imagecolorallocate($watermark, $r, $g, $b);
+
+imagettftext($watermark, $watermark_size, 0, 0, ($watermark_height-($watermark_height/30)), $color, $txt_font, $txt_cont);
+$watermark_orginal = $watermark;
+unset($watermark);
+}
+else
+{
+
+if ($watermark_mime == 'image/gif') {
+$watermark_orginal=imagecreatefromgif($watermark_logo);
+		} elseif ($watermark_mime == 'image/png') {
+$watermark_orginal=imagecreatefrompng($watermark_logo);
+		} elseif ($watermark_mime == 'image/jpeg') {
+$watermark_orginal=imagecreatefromjpeg($watermark_logo);
+		}else
+{
+$watermark_orginal=imagecreatefrompng($watermark_logo);
+}
+
+
+$watermark_orginal_width = imagesx($watermark_orginal);
+$watermark_orginal_height = imagesy($watermark_orginal);
+
+
+$watermark_width = round($watermark_orginal_width * $watermark_size_ratio);
+$watermark_height = round($watermark_orginal_height * $watermark_size_ratio);
+
+$watermark = imagecreatetruecolor($watermark_width, $watermark_height);
+
+imagealphablending($watermark, false);
+imagesavealpha($watermark, true);
+
+$col=imagecolorallocatealpha($watermark,255,255,255,127);
+imagefill($watermark, 0, 0, $col);
+
+imagecopyresized($watermark, $watermark_orginal, 0, 0, 0, 0, $watermark_width, $watermark_height, $watermark_orginal_width,$watermark_orginal_height);
+
+
+$watermark_orginal = $watermark;
+
+unset($watermark);
+}
+
+
+            switch($watermark_position) {
+             case 'topleft':
+                 $watermark_pos_x = 0;
+                 $watermark_pos_y = 0;
+                 break;
+             case 'topright':
+                 $watermark_pos_x = $infowidth - $watermark_width;
+                 $watermark_pos_y = 0;
+                 break;
+             case 'bottomleft':
+                 $watermark_pos_x = 0;
+                 $watermark_pos_y = $infoheight - $watermark_height;
+                 break;
+ 		case 'special':
+		$xref = $infowidth;
+		$yref = $infoheight;
+
+		if ($xref>$yref) $yref = $xref;
+		if ($xref<$yref) $xref = $yref;
+
+                 $watermark_pos_x = $xref - $watermark_width;
+                 $watermark_pos_y = $yref - $watermark_height;
+                 break;
+             case 'bottomright':
+                 $watermark_pos_x = $infowidth - $watermark_width;
+                 $watermark_pos_y = $infoheight - $watermark_height;
+                 break;
+          case 'center':
+             $watermark_pos_x = ($infowidth-$watermark_width)/2;
+             $watermark_pos_y = ($infoheight- $watermark_height)/2;
+             break;
+
+       case 'leftcenter':
+             $watermark_pos_x = 0;
+             $watermark_pos_y = ($infoheight- $watermark_height)/2;
+             break;
+
+       case 'rightcenter':
+             $watermark_pos_x = ($infowidth-$watermark_width);
+             $watermark_pos_y = ($infoheight- $watermark_height)/2;
+             break;
+
+       case 'topcenter':
+             $watermark_pos_x = ($infowidth-$watermark_width)/2;
+             $watermark_pos_y = 0;
+             break;
+
+       case 'bottomcenter':
+             $watermark_pos_x = ($infowidth-$watermark_width)/2;
+             $watermark_pos_y = ($infoheight- $watermark_height);
+             break;
+         }
+
+if ($watermark_gray)
+{
+ imagefilter($watermark_orginal, IMG_FILTER_GRAYSCALE);
+}
+
+
+
+
+
+if ($watermark_rotate==0)$watermark_rotate=360;
+
+
+if ($watermark_mime == 'image/png' || $watermark_mime == 'image/gif')
+{
+$output = imagecreatetruecolor(imagesx($this->image), imagesy($this->image));
+
+$white = imagecolorallocate($output,  255, 255, 255);
+imagefilledrectangle($output, 0, 0, imagesx($this->image), imagesy($this->image), $white);
+imagecopy($output, $this->image, 0, 0, 0, 0, imagesx($this->image), imagesy($this->image));
+
+$this->image = $output;
+}
+
+
+
+
+$transparency = imagecolorallocatealpha($watermark_orginal, 255,255,255, 127);
+$watermark_orginal = imagerotate($watermark_orginal, $watermark_rotate, $transparency);
+
+
+
+
+
+
+
+
+
+$dst_x=$watermark_pos_x;
+$dst_y=$watermark_pos_y;
+
+
+
+$src_w=imagesx($watermark_orginal);
+$src_h=imagesy($watermark_orginal);
+
+
+
+
+
+if ($watermark_repeat)
+{
+
+$pieces_x=floor($infowidth/imagesx($watermark_orginal))+1;
+$pieces_y=floor($infoheight/imagesy($watermark_orginal))+1;
+
+
+$cut = imagecreatetruecolor($src_w*$pieces_x, $src_h*$pieces_y); 
+
+imagecopy($cut, $this->image, 0, 0, $dst_x, $dst_y, $src_w*$pieces_x, $src_h*$pieces_y); 
+
+
+
+for($x=0;$x<=$pieces_x;$x++)
+{
+   imagecopy($cut, $watermark_orginal, $x*$src_w, 0, 0, 0, $src_w, $src_h); 
+
+for($y=0;$y<=$pieces_y;$y++)
+{
+   imagecopy($cut, $watermark_orginal, $x*$src_w, $y*$src_h, 0, 0, $src_w, $src_h); 
+}
+
+}
+ 
+
+}
+else
+{
+$cut = imagecreatetruecolor($src_w, $src_h); 
+imagecopy($cut, $this->image, 0, 0, $dst_x, $dst_y, $src_w, $src_h); 
+
+imagecopy($cut, $watermark_orginal, 0, 0, 0, 0, $src_w, $src_h); 
+}
+
+imagecopymerge($this->image, $cut, $dst_x, $dst_y, 0, 0, imagesx($cut), imagesy($cut), $watermark_opacity); 
+
+}
+}
+}
+]]></add>
+		
+</operation>
+	
+</file>
+
+
+
+
+
+
+
+
+
+<file name="catalog/view/theme/*/template/product/product.tpl">
+		
+
+<operation>
+			
+<search position="after"><![CDATA[<?php if ($thumb) { ?>]]></search>
+			
+
+
+			
+<add>
+<![CDATA[
+<?php
+
+$watermark_conf="watermark.conf";
+
+$contentfilter = array();
+$pagefilter = array();
+
+
+$realrootpath = dirname(__FILE__);
+$realrootpath = str_replace('\vqmod\vqcache','',$realrootpath);
+$realrootpath = str_replace('/vqmod/vqcache','',$realrootpath);
+
+
+$curpath = realpath('.');
+$curfolder = preg_replace('/\\\\/','',str_replace($realrootpath,'', $curpath));
+
+$watermark_conf = $realrootpath  ."/" . $watermark_conf;
+
+include($watermark_conf);
+
+
+
+
+
+if ($stock_chk==TRUE && $curfolder!=$admin_dir)
+{
+
+
+	global  $registry;
+   		$model_manufacturer = $registry->get('model_catalog_manufacturer');
+ 		$model_product = $registry->get('model_catalog_product');
+
+if (!function_exists('get_string_between')) {
+function get_string_between($string, $start, $end){
+    $string = " ".$string;
+    $ini = strpos($string,$start);
+    if ($ini == 0) return "";
+    $ini += strlen($start);
+    $len = strpos($string,$end,$ini) - $ini;
+    return substr($string,$ini,$len);
+}
+}
+
+
+
+
+if (isset($_GET["product_id"])==false || is_numeric($_GET["product_id"])==false)
+{
+
+ob_start();
+var_dump($model_product);
+$product_id = ob_get_clean();
+
+$product_id=get_string_between($product_id,'product_id','route');
+//$product_id=get_string_between($product_id,'product_id','}');
+
+$product_id=substr($product_id,1);
+$product_id=get_string_between($product_id,'"','"');
+
+}
+else
+{
+$product_id=$_GET["product_id"];
+}
+
+
+
+
+
+
+if ($product_id!=null && $product_id!='')
+{
+
+ 		$result_product = $model_product->getProduct($product_id);
+
+//if ($result_product==null){if (isset($_GET["product_id"])){$result_product = $model_product->getProduct($_GET["product_id"]);}}
+if ($result_product==null){if (isset($product_id) && $product_id>0){$result_product = $model_product->getProduct($product_id);}}
+
+
+
+
+if ($result_product!=null && $result_product!='')
+{
+$model_product = $registry->get('model_catalog_product');
+
+
+if ($result_product['quantity']==0)
+{
+echo "<img src=" . $stock_logo . " id=outofstock style='position:absolute; top:0px; left:0px; width:" . $stock_logo_width . "px; height:" . $stock_logo_height . "px;' />";
+}
+
+
+}
+}
+
+
+
+
+
+}
+
+
+
+
+?>
+]]></add>
+		
+</operation>
+
+</file>
+	
+
+
+
+</modification>
